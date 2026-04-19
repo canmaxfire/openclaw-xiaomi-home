@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>ai.openclaw.ha-mcp</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/opt/homebrew/bin/node</string>
+        <string>/Users/nanali/.openclaw/skills/openclaw-xiaomi-home/scripts/ha-mcp-server/src/http-server.mjs</string>
+    </array>
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>HOME</key>
+        <string>/Users/nanali</string>
+    </dict>
+    <key>WorkingDirectory</key>
+    <string>/Users/nanali/.openclaw/skills/openclaw-xiaomi-home/scripts/ha-mcp-server</string>
+    <key>StandardOutPath</key>
+    <string>/Users/nanali/.openclaw/logs/ha-mcp.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/nanali/.openclaw/logs/ha-mcp.err.log</string>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+</dict>
+</plist>
