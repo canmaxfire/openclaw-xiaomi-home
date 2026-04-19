@@ -4,6 +4,10 @@
 
 set -e
 
+SKILL_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+SCRIPT_DIR="$SKILL_DIR/scripts/ha-mcp-server"
+PLIST_SRC="$SCRIPT_DIR/ai.openclaw.ha-mcp.plist"
+
 echo "=========================================="
 echo "Xiaomi Home Skill Setup"
 echo "=========================================="
@@ -20,60 +24,78 @@ if ! docker info &> /dev/null; then
     echo "Please start Docker Desktop."
     exit 1
 fi
-
 echo "✓ Docker is installed and running"
-
-# Create config directory
-mkdir -p config
 
 # Start Home Assistant
 echo ""
 echo "Starting Home Assistant..."
-docker compose up -d
+cd "$SKILL_DIR"
+docker compose up -d 2>/dev/null || docker run -d \
+  --name homeassistant \
+  --privileged \
+  -p 8123:8123 \
+  -v ~/homeassistant/config:/config \
+  -v /etc/localtime:/etc/localtime:ro \
+  -e TZ=Asia/Shanghai \
+  --dns=8.8.8.8 \
+  --dns=223.5.5.5 \
+  --restart=unless-stopped \
+  ghcr.io/home-assistant/home-assistant:stable
 
-echo ""
 echo "✓ Home Assistant started"
 echo "  Access at: http://localhost:8123"
 echo ""
 echo "  First-time setup:"
-echo "  1. Create your Home Assistant account"
-echo "  2. Go to Settings → Devices & Services → Add Integration"
-echo "  3. Search for 'Xiaomi Home' and install it"
-echo "  4. Login with your Xiaomi account"
-echo ""
-echo "  After setup, generate a Long-Lived Access Token:"
-echo "  5. Profile → Security → Long-Lived Access Tokens → Create Token"
-echo "  6. Copy the token and update scripts/ha-mcp-server/.env"
+echo "  1. Open http://localhost:8123 and create your account"
+echo "  2. Add 'external_url: http://localhost:8123' to ~/homeassistant/config/configuration.yaml"
+echo "  3. Go to Settings → Devices & Services → Add Integration"
+echo "  4. Search 'Xiaomi Home' and login with your Xiaomi account"
+echo "  5. Profile → Security → Create Long-Lived Access Token"
 echo ""
 
-# Setup MCP server
-echo "=========================================="
-echo "MCP Server Setup"
-echo "=========================================="
-
-cd scripts/ha-mcp-server
-
-if [ ! -f .env ]; then
-    cp .env.example .env
-    echo "✓ Created .env file from template"
-    echo "  Please edit .env and add your HA_TOKEN"
+# Setup HA token
+if [ ! -f "$SCRIPT_DIR/.env" ]; then
+    echo "=========================================="
+    echo "MCP Server Configuration"
+    echo "=========================================="
+    echo "Enter your Home Assistant Long-Lived Access Token:"
+    read -r HA_TOKEN
+    echo "HA_URL=http://localhost:8123" > "$SCRIPT_DIR/.env"
+    echo "HA_TOKEN=$HA_TOKEN" >> "$SCRIPT_DIR/.env"
+    echo "PORT=3002" >> "$SCRIPT_DIR/.env"
+    echo "✓ Created .env file"
 else
     echo "✓ .env file already exists"
 fi
 
+# Install MCP Server dependencies
 echo ""
-echo "Installing MCP server dependencies..."
-npm install
-npm run build
+echo "Installing MCP Server..."
+cd "$SCRIPT_DIR"
+npm install --silent 2>/dev/null
+
+# Setup LaunchAgent
+echo ""
+echo "Installing HA MCP Server as LaunchAgent..."
+mkdir -p "$HOME/Library/LaunchAgents"
+mkdir -p "$(dirname "$PLIST_SRC")"
+
+# Create user-specific plist
+PLIST_DST="$HOME/Library/LaunchAgents/ai.openclaw.ha-mcp.plist"
+sed "s|/Users/nanali|$HOME|g" "$PLIST_SRC" > "$PLIST_DST"
+launchctl load "$PLIST_DST" 2>/dev/null || true
+echo "✓ HA MCP Server installed as LaunchAgent"
 
 echo ""
 echo "=========================================="
 echo "Setup Complete!"
 echo "=========================================="
 echo ""
-echo "Next steps:"
-echo "1. Add your HA_TOKEN to scripts/ha-mcp-server/.env"
-echo "2. Configure mcporter to use the MCP server"
-echo "3. Restart OpenClaw"
+echo "HA MCP Server: http://localhost:3002"
+echo "Home Assistant: http://localhost:8123"
 echo ""
-echo "For detailed instructions, see: references/installation.md"
+echo "Test the MCP server:"
+echo "  node $SCRIPT_DIR/src/call-tool.mjs ping_ha"
+echo ""
+echo "For OpenClaw integration, add this skill to your OpenClaw"
+echo "and the MCP server will automatically handle device control."

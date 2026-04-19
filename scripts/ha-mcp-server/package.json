@@ -1,21 +1,24 @@
 {
   "name": "ha-mcp-server",
   "version": "1.0.0",
-  "description": "MCP server for Home Assistant Xiaomi Home integration",
-  "main": "dist/index.js",
+  "description": "MCP server for Home Assistant - controls Xiaomi devices via natural language",
   "type": "module",
+  "main": "src/http-server.mjs",
   "scripts": {
-    "build": "tsc",
-    "start": "node dist/index.js",
-    "dev": "tsx watch src/index.ts"
+    "start": "node src/http-server.mjs",
+    "start:stdio": "node src/index.mjs",
+    "test": "node src/call-tool.mjs ping_ha"
   },
+  "keywords": [
+    "home-assistant",
+    "xiaomi",
+    "mcp",
+    "smart-home",
+    "openclaw"
+  ],
+  "author": "Nana / OpenClaw",
+  "license": "MIT",
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.0.0",
     "dotenv": "^16.4.5"
-  },
-  "devDependencies": {
-    "@types/node": "^22.0.0",
-    "tsx": "^4.19.0",
-    "typescript": "^5.6.0"
   }
 }
