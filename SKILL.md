@@ -1,65 +1,98 @@
 ---
 name: openclaw-xiaomi-home
-description: Control Xiaomi/Mijia smart home devices via Home Assistant using natural language. Use when user wants to control lights, air conditioning, sensors, locks, or other Xiaomi IoT devices with text or voice commands. Also use for querying device status, setting up automations, or receiving proactive alerts. Triggers: "turn on the living room light", "set AC to 26 degrees", "is the door locked?", "what's the temperature?", "turn off all lights when I leave", "lock the front door".
+description: Control your Xiaomi smart home devices with plain English — no apps, no switching, just tell your AI assistant what to do. Ask things like "turn on the living room light", "set AC to 26 degrees", "is the front door locked?", or "what's the temperature in the bedroom?" and it handles it instantly. Great for hands-free control when your phone isn't nearby, voice control through your AI assistant, or automating your home with plain text commands. Triggers: "turn on the light", "set AC temperature", "is the door locked?", "check the temperature", "lock all doors", "turn everything off".
 
-NOTE: This skill requires Home Assistant running locally (Docker at localhost:8123) and an HA MCP server running at localhost:3002. The MCP server reads the HA access token from the local .env file. All device control stays on the local network.
+NOTE: Requires Home Assistant running locally (free, runs on Docker) and Xiaomi devices paired with Mi Home. All control stays on your local network — no cloud, no subscription, no data collection.
 ---
 
-# openclaw-xiaomi-home
+# Xiaomi Home Control
 
-Control Xiaomi/Mijia smart home devices via Home Assistant using natural language commands.
+**Control your Xiaomi devices with plain English.** No apps. No switching. Just tell your AI assistant what you want.
+
+## What It Does
+
+Instead of opening the Mi Home app, finding the right device, and tapping buttons — just say:
+
+```
+"Turn on the living room light"
+"Set bedroom AC to 26 degrees"
+"Is the front door locked?"
+"What's the temperature?"
+"Turn off all lights"
+"Lock the door"
+```
+
+Your AI assistant handles it instantly.
+
+## What You Can Control
+
+| Category | Examples |
+|----------|---------|
+| **Lights** | Turn on/off, adjust brightness |
+| **Air Conditioning** | Set temperature, change mode |
+| **Door Locks** | Lock/unlock doors remotely |
+| **Sensors** | Check temperature, humidity, motion |
+| **Fans & Humidifiers** | Turn on/off, set speed |
+| **Blinds & Curtains** | Open/close |
+| **Robot Vacuums** | Start cleaning, return to charger |
+
+Works with 1837+ Xiaomi/Mijia devices via the Xiaomi Home integration.
+
+## How It Works
+
+```
+You: "Turn on the living room light"
+  ↓
+OpenClaw AI → Your Home Assistant → Xiaomi Device
+```
+
+Everything stays **on your home network** — no cloud, no Xiaomi servers involved after setup.
 
 ## Setup
 
 ```bash
-# Install Home Assistant (Docker)
-cd ~/.openclaw/skills/openclaw-xiaomi-home
+# 1. Start Home Assistant (free, one-time setup)
 docker compose up -d
 
-# Install MCP server
-cd ~/.openclaw/skills/openclaw-xiaomi-home/scripts/ha-mcp-server
-npm install && cp .env.example .env
-# Edit .env with your HA_URL and HA_TOKEN
+# 2. Install the control server
+cd scripts/ha-mcp-server && npm install
 
-# Start MCP server
-launchctl load ~/.openclaw/skills/openclaw-xiaomi-home/scripts/ha-mcp-server/ai.openclaw.ha-mcp.plist
+# 3. Connect to your Xiaomi devices
+# (open Home Assistant at localhost:8123, add Xiaomi Home integration)
+
+# 4. Done — control with your AI assistant
 ```
 
-## Usage
+Full step-by-step in README.md.
 
-Control devices via natural language after setup. See README.md for full tool list and troubleshooting.
+## Why This Is Better
 
-## Environment
+| Traditional Way | With This Skill |
+|----------------|-----------------|
+| Open Mi Home app | Just speak/text your AI |
+| Find the right device | AI finds it automatically |
+| Tap multiple buttons | One sentence does it all |
+| Can't control when away | Works through AI assistant |
+| One device at a time | Control everything at once |
 
-- HA at `http://localhost:8123`
-- MCP server at `http://localhost:3002`
-- Token stored in `.env` (never transmitted externally)
+## Privacy
 
-## Available Tools
-
-| Tool | Description |
-|------|-------------|
-| `light_turn_on` / `light_turn_off` | Control lights |
-| `climate_set_temperature` / `climate_set_mode` | Control AC/heaters |
-| `fan_turn_on` / `fan_turn_off` / `fan_set_speed` | Control fans |
-| `switch_turn_on` / `switch_turn_off` | Control switches/plugs |
-| `lock_lock` / `lock_unlock` | Control door locks |
-| `humidifier_turn_on` / `humidifier_turn_off` | Control humidifiers |
-| `cover_open` / `cover_close` | Control blinds/curtains |
-| `vacuum_start` / `vacuum_stop` / `vacuum_return_to_base` | Control robot vacuums |
-| `get_sensor_reading` / `list_sensors` | Read sensor values |
-| `list_all_devices` / `get_device_state` | Discover devices |
-| `trigger_scene` | Trigger HA scenes |
-| `ping_ha` | Check HA connection |
+- **Local only** — all traffic stays in your home
+- **No cloud** — Xiaomi cloud only used for initial device pairing
+- **No data collection** — nothing is tracked or transmitted
+- **You own everything** — Home Assistant runs on your own hardware
 
 ## Example Commands
 
 ```
 "Turn on the living room light"
-"Set bedroom AC to 26 degrees"
-"What's the current temperature?"
+"Dim the bedroom to 30%"
+"Set AC to cool mode at 24 degrees"
+"Is the door locked?"
 "Lock the front door"
+"What's the living room temperature?"
 "Turn off all lights"
-"Open the blinds"
-"Return vacuum to base"
+"Close the bedroom blinds"
+"Start the vacuum"
+"Return the vacuum to base"
 ```
