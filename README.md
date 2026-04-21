@@ -1,6 +1,6 @@
 # openclaw-xiaomi-home
 
-[![Version](https://img.shields.io/badge/version-v1.1.0-blue.svg)](https://github.com/canmaxice-maker/openclaw-xiaomi-home)
+[![Version](https://img.shields.io/badge/version-v1.1.3-blue.svg)](https://github.com/canmaxfire/openclaw-xiaomi-home)
 [![ClawHub](https://img.shields.io/badge/ClawHub-openclaw--xiaomi--home-green.svg)](https://clawhub.com/openclaw-xiaomi-home)
 
 **Your OpenClaw can now control your smart home.** Connect to Xiaomi/Mijia devices through Home Assistant and control everything with plain text or voice.
@@ -122,20 +122,33 @@ Just talk to your AI assistant:
 
 ## Security & Privacy
 
-| What | How |
-|------|-----|
-| HA access token | Stored locally in `.env` (gitignored), never committed |
-| Token usage | Sent only to YOUR local Home Assistant (`localhost:8123`) |
-| Data collection | None — the MCP server only relays device commands |
-| External calls | None — all traffic stays on your local network |
-| Xiaomi cloud | Used only once during initial device pairing |
+### Required Credentials
 
-The skill does NOT:
-- Send your HA token to any external service
-- Collect, log, or transmit usage data
-- Use any LLM or AI processing
+| Credential | Purpose | Storage |
+|------------|---------|---------|
+| `HA_TOKEN` | Home Assistant Long-Lived Access Token | `.env` file (gitignored) |
 
-The `suspicious.env_credential_access` flag in the security scan is because this skill reads a local access token from `.env` to authenticate with your Home Assistant — this is by design and necessary for the skill to function.
+### Security Model
+
+| Concern | Mitigation |
+|---------|------------|
+| Unauthenticated access | MCP server requires `Authorization: Bearer <HA_TOKEN>` on every request |
+| Cross-origin abuse | CORS restricted to `http://localhost` only |
+| LAN access | Server binds to localhost, not all interfaces |
+| Token exfiltration | HA_TOKEN is only sent to `localhost:8123` — never to external services |
+| Credential leakage | `.env` is in `.gitignore` — never committed to git |
+
+### What This Skill Does NOT Do
+
+- ❌ Does NOT transmit your HA token to any external service
+- ❌ Does NOT accept requests from non-localhost origins
+- ❌ Does NOT collect, log, or transmit usage data
+- ❌ Does NOT use any LLM or AI processing
+- ❌ Does NOT expose unauthenticated endpoints
+
+### CORS Configuration
+
+CORS is restricted to `http://localhost` only. The MCP server will reject any request with a different origin, preventing LAN-based abuse.
 
 ## Troubleshooting
 

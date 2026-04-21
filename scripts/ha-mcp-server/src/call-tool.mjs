@@ -4,20 +4,34 @@
  */
 
 import http from "http";
+import { readFileSync } from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const envPath = path.resolve(__dirname, "../.env");
+const env = {};
+try {
+  const lines = readFileSync(envPath, "utf8").split("\n");
+  for (const line of lines) {
+    const [key, ...vals] = line.split("=");
+    if (key && vals.length) env[key.trim()] = vals.join("=").trim();
+  }
+} catch (e) { /* no .env */ }
 
 const HOST = process.env.HA_MCP_HOST || "localhost";
 const PORT = process.env.HA_MCP_PORT || "3002";
+const HA_TOKEN = env.HA_TOKEN || "";
 
 function rpc(method, params = {}) {
   return new Promise((resolve, reject) => {
     const body = JSON.stringify({ jsonrpc: "2.0", id: 1, method, params });
-    const options = {
-      hostname: HOST,
-      port: PORT,
-      path: "/",
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Content-Length": Buffer.byteLength(body) },
+    const headers = {
+      "Content-Type": "application/json",
+      "Content-Length": Buffer.byteLength(body),
+      "Authorization": `Bearer ${HA_TOKEN}`,
     };
+    const options = { hostname: HOST, port: PORT, path: "/", method: "POST", headers };
     const req = http.request(options, res => {
       let data = "";
       res.on("data", chunk => data += chunk);

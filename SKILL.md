@@ -4,7 +4,14 @@ description: Your OpenClaw can now control your smart home. It connects to your 
 
 NOTE: Requires Home Assistant (Docker, localhost:8123) and Xiaomi devices paired with Mi Home.
 
-Security: HA access token is stored locally in `.env` (gitignored), used only to authenticate with YOUR local Home Assistant — never sent anywhere else. No data is collected or transmitted. The MCP server runs on your machine and only talks to your local HA instance.
+Required credentials:
+- **HA_TOKEN**: Long-Lived Access Token from Home Assistant, stored in `.env` (gitignored). Used as Bearer token to authenticate MCP server requests. Never sent to any external service.
+
+Security:
+- MCP server only accepts requests from localhost
+- All MCP calls require "Authorization: Bearer <HA_TOKEN>" header
+- HA_TOKEN is never transmitted to any service other than your local Home Assistant
+- No data collection or exfiltration — purely local device control
 ---
 
 # Xiaomi Home Control

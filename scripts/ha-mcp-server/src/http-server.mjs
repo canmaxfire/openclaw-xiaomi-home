@@ -22,6 +22,15 @@ try {
 const HA_URL = env.HA_URL || "http://localhost:8123";
 const HA_TOKEN = env.HA_TOKEN || "";
 const PORT = parseInt(env.PORT || "3002", 10);
+const ALLOWED_ORIGIN = "http://localhost"; // Only allow localhost for CORS
+
+// Simple bearer token auth: must send "Authorization: Bearer <HA_TOKEN>" header
+function checkAuth(req) {
+  const auth = req.headers["authorization"] || req.headers["Authorization"];
+  if (!auth || !auth.startsWith("Bearer ")) return false;
+  const token = auth.slice("Bearer ".length);
+  return token === HA_TOKEN;
+}
 
 // ============================================================================
 // HA API
@@ -163,8 +172,21 @@ function textResult(text) {
 
 const server = http.createServer(async (req, res) => {
   if (req.method === "OPTIONS") {
-    res.writeHead(200, { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "POST, GET, OPTIONS", "Access-Control-Allow-Headers": "Content-Type, Authorization" });
+    res.writeHead(200, { "Access-Control-Allow-Origin": ALLOWED_ORIGIN, "Access-Control-Allow-Methods": "POST, GET, OPTIONS", "Access-Control-Allow-Headers": "Content-Type, Authorization" });
     res.end();
+    return;
+  }
+  // Reject requests from non-localhost origins
+  const origin = req.headers["origin"] || req.headers["Origin"];
+  if (origin && !origin.startsWith(ALLOWED_ORIGIN)) {
+    res.writeHead(403, { "Content-Type": "application/json" });
+    res.end(JSON.stringify({ error: "Forbidden: cross-origin request denied" }));
+    return;
+  }
+  // Require authentication for all tool calls
+  if (req.method === "POST" && !checkAuth(req)) {
+    res.writeHead(401, { "Content-Type": "application/json", "WWW-Authenticate": "Bearer" });
+    res.end(JSON.stringify({ error: "Unauthorized: valid Bearer token required" }));
     return;
   }
   if (req.method === "GET" && req.url === "/health") {
