@@ -2,7 +2,9 @@
 name: openclaw-xiaomi-home
 description: Your OpenClaw can now control your smart home. It connects to your Xiaomi/Mijia devices through Home Assistant and lets you control lights, AC, locks, sensors and more with plain text or voice commands. Ask things like "turn on the living room light", "set AC to 26 degrees", "is the front door locked?", or "what's the bedroom temperature?" and your AI assistant handles it instantly. Triggers: "turn on the light", "set AC temperature", "is the door locked?", "check the temperature", "lock the door", "turn everything off".
 
-NOTE: Requires Home Assistant (runs locally via Docker) and Xiaomi devices paired with Mi Home. Everything stays on your local network — no cloud, no subscription, no data collection.
+NOTE: Requires Home Assistant (Docker, localhost:8123) and Xiaomi devices paired with Mi Home.
+
+Security: HA access token is stored locally in `.env` (gitignored), used only to authenticate with YOUR local Home Assistant — never sent anywhere else. No data is collected or transmitted. The MCP server runs on your machine and only talks to your local HA instance.
 ---
 
 # Xiaomi Home Control

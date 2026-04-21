@@ -120,12 +120,22 @@ Just talk to your AI assistant:
 "Start the vacuum"
 ```
 
-## Privacy
+## Security & Privacy
 
-- **Local network only** — all control stays in your home
-- **No cloud** — Xiaomi cloud only for initial pairing
-- **No data collection** — nothing is tracked or sent
-- **Docker isolation** — Home Assistant runs in a container
+| What | How |
+|------|-----|
+| HA access token | Stored locally in `.env` (gitignored), never committed |
+| Token usage | Sent only to YOUR local Home Assistant (`localhost:8123`) |
+| Data collection | None — the MCP server only relays device commands |
+| External calls | None — all traffic stays on your local network |
+| Xiaomi cloud | Used only once during initial device pairing |
+
+The skill does NOT:
+- Send your HA token to any external service
+- Collect, log, or transmit usage data
+- Use any LLM or AI processing
+
+The `suspicious.env_credential_access` flag in the security scan is because this skill reads a local access token from `.env` to authenticate with your Home Assistant — this is by design and necessary for the skill to function.
 
 ## Troubleshooting
 
