@@ -157,6 +157,16 @@ const tools = {
   // Scene
   trigger_scene: async ({ entity_id }) => { await callService("scene", "turn_on", { entity_id }); return textResult(`Scene ${entity_id} triggered`); },
 
+  // XiaoAI TTS Announce
+  xiaoai_announce: async ({ message, entity_id }) => {
+    const target = entity_id || "notify.xiaomi_cn_501481700_l16a_play_text_a_7_3";
+    await haFetch("/services/notify/send_message", {
+      method: "POST",
+      body: JSON.stringify({ message, entity_id: target }),
+    });
+    return textResult(`XiaoAI announced: ${message}`);
+  },
+
   // HA status
   ping_ha: async () => { await haFetch("/config"); return textResult("Home Assistant is reachable and running"); },
   get_ha_config: async () => { const c = await haFetch("/config"); return textResult(`Home Assistant version: ${c.version}`); },

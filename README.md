@@ -1,6 +1,6 @@
 # openclaw-xiaomi-home
 
-[![Version](https://img.shields.io/badge/version-v1.1.3-blue.svg)](https://github.com/canmaxfire/openclaw-xiaomi-home)
+[![Version](https://img.shields.io/badge/version-v1.2.0-blue.svg)](https://github.com/canmaxfire/openclaw-xiaomi-home)
 [![ClawHub](https://img.shields.io/badge/ClawHub-openclaw--xiaomi--home-green.svg)](https://clawhub.com/openclaw-xiaomi-home)
 
 **Your OpenClaw can now control your smart home.** Connect to Xiaomi/Mijia devices through Home Assistant and control everything with plain text or voice.
@@ -120,6 +120,33 @@ Just talk to your AI assistant:
 "Start the vacuum"
 ```
 
+## XiaoAI TTS Voice Announcement
+
+Use XiaoAI speakers as a voice announcement system — your AI can "speak" reminders and alerts through the speaker.
+
+**Available entities:**
+- Living room: `notify.xiaomi_cn_501481700_l16a_play_text_a_7_3`
+- Bedroom: `notify.xiaomi_cn_501582478_l16a_play_text_a_7_3`
+
+**Python script:** `~/.openclaw/workspace/scripts/xiaoai_announce.py`
+
+```bash
+# Basic usage
+python3 ~/.openclaw/workspace/scripts/xiaoai_announce.py "06:30 该起床了"
+
+# Specify a different speaker
+python3 ~/.openclaw/workspace/scripts/xiaoai_announce.py "测试" "notify.xiaomi_cn_501582478_l16a_play_text_a_7_3"
+```
+
+**Use cases:**
+- Health reminders (meal times, workouts, sleep)
+- Smart home alerts ("Front door opened!")
+- Agent notifications (cron job results, errors)
+
+**MCP tool:** `xiaoai_announce(message, entity_id?)`
+
+---
+
 ## Security & Privacy
 
 ### Required Credentials
@@ -175,6 +202,7 @@ docker logs homeassistant
 
 | Version | Date | Changes |
 |---------|------|---------|
+| [v1.2.0](https://github.com/canmaxice-maker/openclaw-xiaomi-home/releases/tag/v1.2.0) | 2026-04-24 | Added XiaoAI TTS voice announcement via `xiaoai_announce` tool |
 | [v1.1.0](https://github.com/canmaxice-maker/openclaw-xiaomi-home/releases/tag/v1.1.0) | 2026-04-21 | Plain language rewrite — user benefit focus |
 | [v1.0.0](https://github.com/canmaxice-maker/openclaw-xiaomi-home/releases/tag/v1.0.0) | 2026-04-21 | Initial release |
 
