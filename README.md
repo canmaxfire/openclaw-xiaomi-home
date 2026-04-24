@@ -8,16 +8,13 @@
 ## The Problem It Solves
 
 Smart home devices are scattered across apps:
-- Open Mi Home app
-- Find the right room
-- Find the right device
-- Tap the right button
+- Open Mi Home app → find device → tap button
 
-**This skill fixes that.** Once set up, just tell your AI what you want:
+**This skill fixes that.** Just tell your AI what you want:
 
 ```
 "Turn on the living room light"
-"Set AC to 26 degrees"
+"Set bedroom AC to 26 degrees"
 "Is the front door locked?"
 ```
 
@@ -26,14 +23,15 @@ Done.
 ## What You Can Control
 
 | Category | Examples |
-|----------|---------|
+|----------|----------|
 | 💡 Lights | On/off, brightness |
 | ❄️ Air Conditioning | Temperature, mode, fan speed |
 | 🔐 Door Locks | Lock/unlock from anywhere |
 | 🌡️ Sensors | Temperature, humidity, motion |
 | 💨 Fans & Humidifiers | On/off, speed |
 | 🪟 Blinds & Curtains | Open/close |
-| 🤖 Robot Vacuums | Start, stop, return to charger |
+| 🤖 Robot Vacuums | Start, stop, return to base |
+| 🔊 **XiaoAI Speakers** | **Voice announcements (TTS)** |
 
 Works with **1837+ Xiaomi/Mijia devices**.
 
@@ -124,26 +122,26 @@ Just talk to your AI assistant:
 
 Use XiaoAI speakers as a voice announcement system — your AI can "speak" reminders and alerts through the speaker.
 
-**Available entities:**
-- Living room: `notify.xiaomi_cn_501481700_l16a_play_text_a_7_3`
-- Bedroom: `notify.xiaomi_cn_501582478_l16a_play_text_a_7_3`
+**⚠️ Note:** Entity IDs are device-specific. You must find your own XiaoAI speaker's `notify` entity in Home Assistant (see [Finding Your Entity IDs](#finding-your-entity-ids) below).
 
 **Python script:** `~/.openclaw/workspace/scripts/xiaoai_announce.py`
 
 ```bash
-# Basic usage
-python3 ~/.openclaw/workspace/scripts/xiaoai_announce.py "06:30 该起床了"
-
-# Specify a different speaker
-python3 ~/.openclaw/workspace/scripts/xiaoai_announce.py "测试" "notify.xiaomi_cn_501582478_l16a_play_text_a_7_3"
+# Find your notify entity ID first (see below), then:
+python3 ~/.openclaw/workspace/scripts/xiaoai_announce.py "06:30 该起床了" "notify.YOUR_ENTITY_ID"
 ```
 
-**Use cases:**
-- Health reminders (meal times, workouts, sleep)
-- Smart home alerts ("Front door opened!")
-- Agent notifications (cron job results, errors)
-
 **MCP tool:** `xiaoai_announce(message, entity_id?)`
+
+**Use cases:** Health reminders, smart home alerts, agent notifications.
+
+### Finding Your Entity IDs
+
+XiaoAI speaker entity IDs are unique to your account. To find them:
+
+1. Open Home Assistant → **Developer Tools → States**
+2. Filter by `notify` and look for entities containing `xiaoai`, `play_text`, or `speaker`
+3. Copy the entity ID (format: `notify.xiaomi_cn_XXXXXXXXXX_xxxx`)
 
 ---
 
@@ -172,10 +170,6 @@ python3 ~/.openclaw/workspace/scripts/xiaoai_announce.py "测试" "notify.xiaomi
 - ❌ Does NOT collect, log, or transmit usage data
 - ❌ Does NOT use any LLM or AI processing
 - ❌ Does NOT expose unauthenticated endpoints
-
-### CORS Configuration
-
-CORS is restricted to `http://localhost` only. The MCP server will reject any request with a different origin, preventing LAN-based abuse.
 
 ## Troubleshooting
 
